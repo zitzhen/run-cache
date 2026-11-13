@@ -149,7 +149,31 @@ jobs:
 
       - name: Sync node_modules cache
         shell: bash
-        run: node cache/scripts/sync-node-modules.mjs source "cache/BlockIDE/$PLATFORM_KEY" "$PLATFORM_KEY"
+        run: node cache/scripts/sync-node-modules.mjs source "cache/BlockIDE/$PLATFORM_KEY" "$PLATFORM_KEY" oversized
+
+      - name: Upload oversized release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          tag="blockide-node-modules-$PLATFORM_KEY"
+          if [ ! -d oversized ] || [ -z "$(find oversized -type f -print -quit)" ]; then
+            echo "No oversized files for $PLATFORM_KEY; skipping release upload."
+            exit 0
+          fi
+          source_commit="$(git -C source rev-parse HEAD)"
+          if ! gh release view "$tag" --repo zitzhen/run-cache >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --repo zitzhen/run-cache \
+              --target main \
+              --title "BlockIDE node_modules $PLATFORM_KEY oversized files" \
+              --notes "Source: zitzhen/BlockIDE@$source_commit"
+          fi
+          while IFS= read -r file; do
+            echo "Uploading $file"
+            gh release upload "$tag" "$file" --repo zitzhen/run-cache --clobber
+          done < <(find oversized -type f)
 
       - name: Commit and push platform cache
         shell: bash
