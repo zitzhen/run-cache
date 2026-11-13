@@ -1,0 +1,168 @@
+name: Cache BlockIDE node_modules
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cache-blockide-main
+  cancel-in-progress: false
+
+jobs:
+  cache:
+    name: Cache ${{ matrix.platform-key }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        include:
+          - platform-key: linux-64
+            runner: ubuntu-24.04
+            architecture: x64
+          - platform-key: win32-x64
+            runner: windows-2025
+            architecture: x64
+          - platform-key: darwin-arm64
+            runner: macos-15
+            architecture: arm64
+    env:
+      PLATFORM_KEY: ${{ matrix.platform-key }}
+      npm_config_arch: ${{ matrix.architecture }}
+      VSCODE_ARCH: ${{ matrix.architecture }}
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    steps:
+      - name: Checkout BlockIDE
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: zitzhen/BlockIDE
+          ref: main
+          path: source
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: source/.nvmrc
+          architecture: ${{ matrix.architecture }}
+
+      - name: Verify Node.js architecture
+        run: node -e "const expected = '${{ matrix.architecture }}'; console.log('Node ' + process.version + ' ' + process.platform + ' ' + process.arch); if (process.arch !== expected) { throw new Error('Expected ' + expected + ', got ' + process.arch); }"
+
+      - name: Install Linux build tools
+        if: matrix.platform-key == 'linux-64'
+        working-directory: source
+        shell: bash
+        run: |
+          set -e
+          ./build/azure-pipelines/linux/apt-retry.sh sudo apt-get update
+          ./build/azure-pipelines/linux/apt-retry.sh sudo apt-get install -y pkg-config libxkbfile-dev libkrb5-dev
+
+      - name: Install Linux build dependencies
+        if: matrix.platform-key == 'linux-64'
+        working-directory: source/build
+        shell: bash
+        run: |
+          set -e
+          for i in {1..5}; do
+            npm ci && break
+            if [ "$i" -eq 5 ]; then
+              echo "npm ci failed too many times" >&2
+              exit 1
+            fi
+            echo "npm ci failed attempt $i, trying again..."
+          done
+
+      - name: Install Linux dependencies
+        if: matrix.platform-key == 'linux-64'
+        working-directory: source
+        shell: bash
+        run: |
+          set -e
+          source ./build/azure-pipelines/linux/setup-env.sh
+          for i in {1..5}; do
+            npm ci && break
+            if [ "$i" -eq 5 ]; then
+              echo "npm ci failed too many times" >&2
+              exit 1
+            fi
+            echo "npm ci failed attempt $i, trying again..."
+          done
+
+      - name: Install Windows dependencies
+        if: matrix.platform-key == 'win32-x64'
+        working-directory: source
+        shell: pwsh
+        env:
+          npm_config_foreground_scripts: 'true'
+        run: |
+          . build/azure-pipelines/win32/exec.ps1
+          $ErrorActionPreference = "Stop"
+          for ($i = 1; $i -le 5; $i++) {
+            try {
+              exec { npm ci }
+              break
+            }
+            catch {
+              if ($i -eq 5) {
+                Write-Error "npm ci failed after 5 attempts"
+                throw
+              }
+              Write-Host "npm ci failed attempt $i, retrying..."
+              Start-Sleep -Seconds 2
+            }
+          }
+
+      - name: Install macOS dependencies
+        if: matrix.platform-key == 'darwin-arm64'
+        working-directory: source
+        shell: bash
+        env:
+          GYP_DEFINES: kerberos_use_rtld=false
+        run: |
+          set -e
+          c++ --version
+          xcode-select -print-path
+          python3 -m pip install --break-system-packages setuptools
+          for i in {1..5}; do
+            npm ci && break
+            if [ "$i" -eq 5 ]; then
+              echo "npm ci failed too many times" >&2
+              exit 1
+            fi
+            echo "npm ci failed attempt $i, trying again..."
+          done
+
+      - name: Verify native optional dependency binaries
+        working-directory: source
+        run: node build/azure-pipelines/common/checkNativeOptionalDeps.ts
+
+      - name: Checkout cache repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: cache
+
+      - name: Sync node_modules cache
+        shell: bash
+        run: node cache/scripts/sync-node-modules.mjs source "cache/BlockIDE/$PLATFORM_KEY" "$PLATFORM_KEY"
+
+      - name: Commit and push platform cache
+        shell: bash
+        run: |
+          set -e
+          git -C cache -c core.longpaths=true add --all -- "BlockIDE/$PLATFORM_KEY"
+          if git -C cache diff --cached --quiet; then
+            echo "No changes for $PLATFORM_KEY; skipping commit."
+            exit 0
+          fi
+          source_commit="$(git -C source rev-parse HEAD)"
+          git -C cache -c user.name='Oliver Lin' -c user.email='oliver@liuxiaozhen.dev' commit \
+            -m "Update BlockIDE $PLATFORM_KEY node_modules cache" \
+            -m "Source: zitzhen/BlockIDE@$source_commit" \
+            -m "Assisted-by: Trae CN: Kimi-K3.1-Pro"
+          git -C cache push origin HEAD:main

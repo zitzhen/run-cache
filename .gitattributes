@@ -1,0 +1,2 @@
+BlockIDE/**/node_modules/** -text
+BlockIDE/*/cache.json text eol=lf
