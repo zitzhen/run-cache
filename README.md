@@ -39,4 +39,27 @@ rsync -a --exclude='cache.json' run-cache/BlockIDE/linux-64/ BlockIDE/
 
 Windows 和 macOS 分别使用 `win32-x64`、`darwin-arm64` 目录。恢复时保留符号链接与可执行权限，无需再次运行 `npm install` 或 `npm ci`。
 
+## 超过 100 MiB 的文件
+
+GitHub 拒绝超过 100 MiB 的 Git 对象。`node_modules` 中的 AI CLI 原生二进制（`@openai/codex*`、`@anthropic-ai/claude-agent-sdk*`、`@github/copilot*` 等）超过该上限，因此不进入 Git，而是发布为同名 Release 的资产：
+
+- Release tag：`blockide-node-modules-<平台目录>`，例如 `blockide-node-modules-linux-64`；
+- `cache.json` 的 `oversizedFiles` 逐项记录 `path`、`size`、`sha256` 与 `assetName`。
+
+先按上一节恢复常规文件，再按 `cache.json` 把资产下载回源目录中的相对路径：
+
+```bash
+cd BlockIDE
+tag=blockide-node-modules-linux-64
+mkdir -p /tmp/oversized-assets
+jq -r '.oversizedFiles[] | "\(.assetName)\t\(.path)"' ../run-cache/BlockIDE/linux-64/cache.json |
+while IFS=$'\t' read -r asset relative; do
+  gh release download "$tag" --repo zitzhen/run-cache --pattern "$asset" --dir /tmp/oversized-assets --clobber
+  mkdir -p "$(dirname "$relative")"
+  mv "/tmp/oversized-assets/$asset" "$relative"
+done
+```
+
+Windows 与 macOS 分别替换为 `win32-x64`、`darwin-arm64` 的 tag 与目录。
+
 MVP1 目前仅支持手动生成和手动恢复，尚未修改 `BlockIDE` 的 CI 消费缓存，也不会随源仓库推送自动刷新。
