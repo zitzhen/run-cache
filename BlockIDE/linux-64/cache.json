@@ -1,0 +1,71 @@
+{
+  "sourceRepository": "zitzhen/BlockIDE",
+  "sourceCommit": "8f9321ec369594727f9fabec54afa13d282503a0",
+  "platformKey": "linux-64",
+  "nodeVersion": "v24.22.1",
+  "npmVersion": "11.19.1",
+  "packageLockSha256": "deae2541d80d143f95c7243839d92b8b15ecb6286d319513d7754374efb162c3",
+  "oversizedReleaseTag": "blockide-node-modules-linux-64",
+  "oversizedFiles": [
+    {
+      "path": "extensions/copilot/node_modules/@github/copilot-linux-x64/copilot",
+      "size": 168692544,
+      "sha256": "d47d8fe63b4a4bd6f0f7cd1ed4074ffff9f4b90c78df61f8513e99e098490c33",
+      "assetName": "copilot.ceceb283a09e"
+    },
+    {
+      "path": "extensions/copilot/node_modules/@github/copilot-linux-x64/prebuilds/linux-x64/runtime.node",
+      "size": 112290984,
+      "sha256": "5dbbafdd65ffce5b89b62472e9303ce3854662bff399dae3ffda44a554c44849",
+      "assetName": "runtime.node.e07d02dbd0a2"
+    },
+    {
+      "path": "extensions/copilot/node_modules/@github/copilot/prebuilds/linux-x64/runtime.node",
+      "size": 112290984,
+      "sha256": "5dbbafdd65ffce5b89b62472e9303ce3854662bff399dae3ffda44a554c44849",
+      "assetName": "runtime.node.7054ff7737b6"
+    },
+    {
+      "path": "extensions/copilot/node_modules/@github/copilot/sdk/prebuilds/linux-x64/runtime.node",
+      "size": 112290984,
+      "sha256": "5dbbafdd65ffce5b89b62472e9303ce3854662bff399dae3ffda44a554c44849",
+      "assetName": "runtime.node.b7898d9fb655"
+    },
+    {
+      "path": "node_modules/@anthropic-ai/claude-agent-sdk-linux-x64-musl/claude",
+      "size": 282384648,
+      "sha256": "e11074c51f730bd91d0cd9568471d828d6552796b5dbcde10e7aaca19f1650c8",
+      "assetName": "claude.90d6b7dd4713"
+    },
+    {
+      "path": "node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude",
+      "size": 288730480,
+      "sha256": "ea0f135784631619a7a409d07322ecec964f9cc4fd377508ed1ba3f141f27912",
+      "assetName": "claude.4a961c87eeb9"
+    },
+    {
+      "path": "node_modules/@github/copilot-sdk-linux-x64/prebuilds/linux-x64/runtime.node",
+      "size": 146590168,
+      "sha256": "36838edaaf06ab13656649b5ca85b5546bc6f9ae88e73727fb0987a19cc5276b",
+      "assetName": "runtime.node.7abfcde95580"
+    },
+    {
+      "path": "node_modules/@github/copilot-sdk-linuxmusl-x64/prebuilds/linuxmusl-x64/runtime.node",
+      "size": 146525720,
+      "sha256": "09f81d69a72b2a97379349bd97c0d8b823eaeabd56bbff88bdd21f6c6b3c010a",
+      "assetName": "runtime.node.7db20b624b71"
+    },
+    {
+      "path": "node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/bin/codex",
+      "size": 296865480,
+      "sha256": "399ff69c431c066e40de318fba45c2b07f45a76b19939d247ee4828fc70c4215",
+      "assetName": "codex.d083503dcd12"
+    },
+    {
+      "path": "remote/node_modules/@github/copilot-sdk-linux-x64/prebuilds/linux-x64/runtime.node",
+      "size": 146590168,
+      "sha256": "36838edaaf06ab13656649b5ca85b5546bc6f9ae88e73727fb0987a19cc5276b",
+      "assetName": "runtime.node.c49e45c83a99"
+    }
+  ]
+}
