@@ -1,0 +1,29 @@
+{
+  "sourceRepository": "zitzhen/BlockIDE",
+  "sourceCommit": "8f9321ec369594727f9fabec54afa13d282503a0",
+  "platformKey": "darwin-arm64",
+  "nodeVersion": "v24.22.1",
+  "npmVersion": "11.19.1",
+  "packageLockSha256": "deae2541d80d143f95c7243839d92b8b15ecb6286d319513d7754374efb162c3",
+  "oversizedReleaseTag": "blockide-node-modules-darwin-arm64",
+  "oversizedFiles": [
+    {
+      "path": "extensions/copilot/node_modules/@github/copilot-darwin-arm64/copilot",
+      "size": 152660608,
+      "sha256": "cd73b3fffe54270a8dc3994e86b62dc3385bbdca7e51e31972da4b5b3d3e73d5",
+      "assetName": "copilot.e8db7bbe4195"
+    },
+    {
+      "path": "node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/claude",
+      "size": 271161296,
+      "sha256": "b9ac5374839f14abf3f1f45610637c332b5daee5ce0d1634726cef87aab78e6a",
+      "assetName": "claude.40baa0ab005d"
+    },
+    {
+      "path": "node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/bin/codex",
+      "size": 249952688,
+      "sha256": "8813367285524ac798dd96d1b071aea30d58708c7226fd236cd275cf1cfdee31",
+      "assetName": "codex.89f89826b8d1"
+    }
+  ]
+}
