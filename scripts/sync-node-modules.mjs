@@ -92,9 +92,7 @@ function extractOversizedFiles(targetRoot, stagingRoot) {
 					assetName,
 				});
 				oversizedBytes += stat.size;
-				const stagingPath = path.join(stagingRoot, relativePath);
-				fs.mkdirSync(path.dirname(stagingPath), { recursive: true });
-				fs.renameSync(absolutePath, stagingPath);
+				fs.renameSync(absolutePath, path.join(stagingRoot, assetName));
 				continue;
 			}
 
