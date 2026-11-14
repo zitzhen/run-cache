@@ -1,4 +1,7 @@
-# run-cache
+ # run-cache
+
+> [!CAUTION]
+>  AI写的太烂了，本仓库弃用 未来可能创建新仓库
 
 `zitzhen/BlockIDE` 的原始 `node_modules` 仓库缓存 MVP1。
 
